@@ -21,6 +21,9 @@ const genneralRefreshToken = async (payload) => {
   return refresh_token;
 };
 
+// thêm phần phân quyền: nghĩa là chỉ có thằng admin mới có quyền xóa được tài khoản user thôi: tạo thêm 1 authMiddleware
+
+
 module.exports = {
   genneralAccessToken,
   genneralRefreshToken
