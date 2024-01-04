@@ -48,28 +48,55 @@ const loginUser = (userLogin) => {
           message: 'The user is not defined'
         })
       };
-      const comparePassword = bcrypt.compareSync(password, checkUser.password); //mã hóa mật khẩu đầu vào và so sánh với mã đã lưu
+
+      const comparePassword = bcrypt.compareSync(password, checkUser.password);
       if (!comparePassword) {
         resolve({
           status: 'OK',
           message: 'The password or user is incorrect'
         })
       }
-      // sau khi login thành công thì:
+
       const access_token =  await genneralAccessToken({
         id: checkUser.id,
         isAdmin: checkUser.isAdmin
       });
-
-      const refresh_token = await genneralRefreshToken({ //sử dụng khi gọi là cái access_token hết hạn, nó sẽ dùng lại cấp lại một cái access_token mới
+      const refresh_token = await genneralRefreshToken({
         id: checkUser.id,
         isAdmin: checkUser.isAdmin
+      });
+
+      resolve({
+      status: 'OK',
+      message: 'SUCCESS',
+      access_token,
+      refresh_token
       })
+    } catch (e) {
+      reject(e)
+    }
+  })
+};
+
+const updateUser = (id, data) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const checkUser = await User.findOne({
+        id: id
+      });
+      if (checkUser === null) {
         resolve({
-        status: 'OK',
-        message: 'SUCCESS',
-        access_token,
-        refresh_token
+          status: 'OK',
+          message: 'The user is not defined'
+        })
+      };
+
+      const updatedUser = await User.findByIdAndUpdate(id, data, { new: true });
+      
+      resolve({
+      status: 'OK',
+      message: 'SUCCESS',
+      data: updatedUser
       })
     } catch (e) {
       reject(e)
@@ -80,4 +107,5 @@ const loginUser = (userLogin) => {
 module.exports = {
   createUser,
   loginUser,
+  updateUser
 };
