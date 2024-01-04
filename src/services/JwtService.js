@@ -21,10 +21,36 @@ const genneralRefreshToken = async (payload) => {
   return refresh_token;
 };
 
-// thêm phần phân quyền: nghĩa là chỉ có thằng admin mới có quyền xóa được tài khoản user thôi: tạo thêm 1 authMiddleware
+const refreshTokenJwtService = (token) => {
+  return new Promise((resolve, reject) => {
+    try {
+      jwt.verify(token, process.env.REFRESH_TOKEN, async (err, user) => {
+        if (err) {
+          resolve({
+            status: 'ERROR',
+            message: 'The authemtication'
+          })
+        };
+        const { payload } = user;
+        const access_token = await genneralAccessToken({
+          id: payload?.id,
+          isAdmin: payload?.isAdmin
+        });
 
+        resolve({
+          status: 'OK',
+          message: 'Success',
+          access_token
+        });
+      });
+    } catch (e) {
+      reject(e)
+    }
+  })
+};
 
 module.exports = {
   genneralAccessToken,
-  genneralRefreshToken
+  genneralRefreshToken,
+  refreshTokenJwtService
 }

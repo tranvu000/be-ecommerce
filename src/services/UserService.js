@@ -15,7 +15,7 @@ const createUser = (newUser) => {
           message: 'The email is already'
         })
       };
-      const hash = bcrypt.hashSync(password, 10); //hash mật khẩu
+      const hash = bcrypt.hashSync(password, 10);
       const createdUser = await User.create({
         name,
         email,
@@ -82,7 +82,7 @@ const updateUser = (id, data) => {
   return new Promise(async (resolve, reject) => {
     try {
       const checkUser = await User.findOne({
-        id: id
+        _id: id
       });
       if (checkUser === null) {
         resolve({
@@ -108,7 +108,7 @@ const deleteUser = (id) => {
   return new Promise(async (resolve, reject) => {
     try {
       const checkUser = await User.findOne({
-        id: id
+        _id: id
       });
       if (checkUser === null) {
         resolve({
@@ -149,7 +149,7 @@ const getDetailsUser = (id) => {
   return new Promise(async (resolve, reject) => {
     try {
       const user = await User.findOne({
-        id: id
+        _id: id
       });
       if (user === null) {
         resolve({
