@@ -2,14 +2,14 @@ const Product = require('../models/ProductModel');
 
 const createProduct = (newProduct) => {
   return new Promise(async (resolve, reject) => {
-    const { name, image, type, price, countInStock, rating, description } = req.body;
+    const { name, image, type, price, countInStock, rating, description } = newProduct;
     try {
       const checkProduct = await Product.findOne({
         name: name
       });
       if (checkProduct !== null) {
         resolve({
-          status: 'OK',
+          status: 'ERR',
           message: 'The name of product is already'
         })
       };
@@ -43,7 +43,7 @@ const updateProduct = (id, data) => {
       });
       if (checkProduct === null) {
         resolve({
-          status: 'OK',
+          status: 'ERR',
           message: 'The product is not defined'
         })
       };
@@ -69,7 +69,7 @@ const getDetailsProduct = (id) => {
       });
       if (product === null) {
         resolve({
-          status: 'OK',
+          status: 'ERR',
           message: 'The product is not defined'
         })
       };
@@ -93,7 +93,7 @@ const deleteProduct = (id) => {
       });
       if (checkProduct === null) {
         resolve({
-          status: 'OK',
+          status: 'ERR',
           message: 'The product is not defined'
         })
       };
@@ -130,7 +130,7 @@ const getAllProduct = (limit, page, sort, filter) => {
       };
       if (sort) {
         const objectSort = {};
-        objectSort[sort[1]] = sort[1];
+        objectSort[sort[1]] = sort[0];
         const allProductSort = await Product.find().limit(limit).skip(page * limit).sort(objectSort);
 
         resolve({

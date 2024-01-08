@@ -1,12 +1,13 @@
 const UserService = require('../services/UserService');
-const JwtService = require('../services/JwtService')
+const JwtService = require('../services/JwtService');
 
 const createUser = async (req, res) => {
   try {
     const { name, email, password, confirmPassword, phone } = req.body
     const reg = /^\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/
-    const isCheckEmail = reg.test(email)
-    if (!name || !email || !password || !confirmPassword || !phone) {
+    const isCheckEmail = reg.test(email);
+
+    if (!email || !password || !confirmPassword) {
       return res.status(200).json({
         status: 'ERR',
         message: 'The input is required'
@@ -23,7 +24,8 @@ const createUser = async (req, res) => {
       })
     };
 
-    const response = await UserService.createUser(req.body)
+    const response = await UserService.createUser(req.body);
+
     return res.status(200).json(response)
   } catch (e) {
     return res.status(404).json({
@@ -34,10 +36,10 @@ const createUser = async (req, res) => {
 
 const loginUser = async (req, res) => {
   try {
-    const { name, email, password, confirmPassword, phone } = req.body
+    const { email, password } = req.body
     const reg = /^\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/
     const isCheckEmail = reg.test(email)
-    if (!name || !email || !password || !confirmPassword || !phone) {
+    if (!email || !password) {
       return res.status(200).json({
         status: 'ERR',
         message: 'The input is required'
@@ -47,15 +49,32 @@ const loginUser = async (req, res) => {
         status: 'ERR',
         message: 'The input is email'
       })
-    } else if (password !== confirmPassword) {
-      return res.status(200).json({
-        status: 'ERR',
-        message: 'The password is equal confirmPassword'
-      })
     };
 
-    const response = await UserService.loginUser(req.body)
-    return res.status(200).json(response)
+    const response = await UserService.loginUser(req.body);
+    const { refresh_token, ...newReponse} = response;
+    res.cookie('refresh_token', refresh_token, {
+      httpOnly: true,  // dùng để chỉ lấy được cái thằng cookie này thông qua http thôi và không lấy được bằng thằng service
+      secure: false,  //thêm những cái bảo mật ở phía client, khi nào mà desloy thì chuyển thành true
+      samesite: 'strict',
+      path: '/'
+    });
+
+    return res.status(200).json(newReponse);
+  } catch (e) {
+    return res.status(404).json({
+      message: e
+    })
+  }
+};
+
+const logoutUser = async (req, res) => {
+  try {
+    res.clearCookie('refresh_token');
+    return res.status(200).json({
+      status: 'OK',
+      message: 'Logout successfully'
+    })
   } catch (e) {
     return res.status(404).json({
       message: e
@@ -115,6 +134,7 @@ const getAllUser = async (req, res) => {
 const getDetailsUser = async (req, res) => {
   try {
     const userId = req.params.id;
+
     if (!userId) {
       return res.status(200).json({
         status: 'ERR',
@@ -132,7 +152,7 @@ const getDetailsUser = async (req, res) => {
 
 const refreshToken = async (req, res) => {
   try {
-    const token = req.headers.token.split(' ')[1];
+    const token = req.cookies.refresh_token
     if (!token) {
       return res.status(200).json({
         status: 'ERR',
@@ -151,6 +171,7 @@ const refreshToken = async (req, res) => {
 module.exports = {
   createUser,
   loginUser,
+  logoutUser,
   updateUser,
   deleteUser,
   getAllUser,
