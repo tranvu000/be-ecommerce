@@ -83,14 +83,14 @@ const getAllProduct = async (req, res) => {
     let { limit, page, sort, filter } = req.query;
     limit = +limit;
     page = +page;
-    const response = await ProductService.getAllProduct(limit || 10, page || 0, sort, filter);
+    const response = await ProductService.getAllProduct(limit || null, page || 0, sort, filter);
 
-    return res.status(200).json(response);
+    return res.status(200).json(response)
   } catch (e) {
     return res.status(404).json({
-      message: e
+        message: e
     })
-  }
+}
 };
 
 module.exports = {
