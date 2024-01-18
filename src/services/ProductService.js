@@ -2,7 +2,7 @@ const Product = require('../models/ProductModel');
 
 const createProduct = (newProduct) => {
   return new Promise(async (resolve, reject) => {
-    const { name, image, type, price, countInStock, rating, description } = newProduct;
+    const { name, image, type, price, countInStock, rating, description, discount } = newProduct;
     try {
       const checkProduct = await Product.findOne({
         name: name
@@ -20,7 +20,8 @@ const createProduct = (newProduct) => {
         price,
         countInStock,
         rating,
-        description
+        description,
+        discount
       });
       if (createdProduct) {
         resolve({
@@ -114,7 +115,7 @@ const getAllProduct = (limit, page, sort, filter) => {
   return new Promise(async (resolve, reject) => {
     try {
       const totalProduct = await Product.countDocuments();
-      
+
       if (filter) {
         const label = filter[0];
         const allObjectFilter = await Product.find({ [label]: { '$regex': filter[1] } }).limit(limit).skip(page * limit)
@@ -126,7 +127,7 @@ const getAllProduct = (limit, page, sort, filter) => {
           pageCurrent: page + 1,
           totalPage: Math.ceil(totalProduct / limit)
         })
-      }
+      };
       if (sort) {
         const objectSort = {}
         objectSort[sort[1]] = sort[0]
@@ -139,7 +140,8 @@ const getAllProduct = (limit, page, sort, filter) => {
           pageCurrent: page + 1,
           totalPage: Math.ceil(totalProduct / limit)
         })
-      }
+      };
+
       const allProduct = await Product.find().limit(limit).skip(page * limit);
 
       resolve({
@@ -171,11 +173,28 @@ const deleteManyProduct = (ids) => {
   })
 };
 
+const getAllType = () => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const allType = await Product.distinct('type');
+
+      resolve({
+        status: 'OK',
+        message: 'Success',
+        data: allType,
+      })
+    } catch (e) {
+      reject(e)
+    }
+  })
+};
+
 module.exports = {
   createProduct,
   updateProduct,
   getDetailsProduct,
   deleteProduct,
   getAllProduct,
-  deleteManyProduct
+  deleteManyProduct,
+  getAllType
 };
