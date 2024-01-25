@@ -1,9 +1,11 @@
 const Order = require("../models/OrderProduct");
 const Product = require("../models/ProductModel");
+const EmailService = require("../services/EmailService");
 
 const createOrder = (newOrder) => {
   return new Promise(async (resolve, reject) => {
-    const { orderItems, paymentMethod, itemsPrice, shippingPrice, totalPrice, fullName, address, city, phone, user, isPaid, paidAt } = newOrder;
+    const { orderItems, paymentMethod, itemsPrice, shippingPrice, totalPrice, fullName, address,
+      city, phone, user, isPaid, paidAt, email } = newOrder;
 
     try {
       const promises = orderItems.map( async (order) => {
@@ -20,27 +22,9 @@ const createOrder = (newOrder) => {
         );
   
         if (productData) {
-          const createdOrder = await Order.create({
-            orderItems,
-            shippingAddress: {
-              fullName,
-              phone,
-              address,
-              city
-            },
-            paymentMethod,
-            itemsPrice,
-            shippingPrice,
-            totalPrice,
-            user: user,
-            isPaid,
-            paidAt
-          })     
-          if (createdOrder) {
-            return {
-              status: 'OK',
-              message: 'SUCCESS',
-            }
+          return {
+            status: 'OK',
+            message: 'SUCCESS'
           }
         } else {
           return {
@@ -54,20 +38,43 @@ const createOrder = (newOrder) => {
       const newData = results && results.filter((item) => item.id);
 
       if (newData.length) {
-        resolve ({
-          status: 'ERR',
-          message: `Sản phẩm với id${newData.join(',')} không đủ hàng`
+        const arrId = [];
+        newData.forEach((item) => {
+          arrId.push(item.id)
         })
-      };
-
-      resolve ({
-        status: 'OK',
-        message: 'SUCCESS'
-      });
+        resolve({
+          status: 'ERR',
+          message: `Sản phẩm với id: ${arrId.join(',')} Không đủ hàng`
+        })
+      } else {
+        const createdOrder = await Order.create({
+          orderItems,
+          shippingAddress: {
+            fullName,
+            phone,
+            address,
+            city
+          },
+          paymentMethod,
+          itemsPrice,
+          shippingPrice,
+          totalPrice,
+          user: user,
+          isPaid,
+          paidAt
+        });
+        if (createdOrder) {
+          await EmailService.sendEmailCreateOrder(email, orderItems)
+          resolve ({
+            status: 'OK',
+            message: 'SUCCESS'
+          })
+        };
+      }
     } catch (e) {
       reject(e)
     }
-  });
+  })
 };
 
 const getAllOrder = (id) => {
