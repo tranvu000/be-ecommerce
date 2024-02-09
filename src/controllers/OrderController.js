@@ -20,7 +20,7 @@ const createOrder = async (req, res) => {
   }
 };
 
-const getAllOrder = async (req, res) => {
+const getAllOrderDetails = async (req, res) => {
   try {
     const userId = req.params.id;
     if (!userId) {
@@ -29,7 +29,7 @@ const getAllOrder = async (req, res) => {
         message: 'The userId is required'
       })
     };
-    const response = await OrderService.getAllOrder(userId);
+    const response = await OrderService.getAllOrderDetails(userId);
 
     return res.status(200).json(response);
   } catch (e) {
@@ -79,9 +79,22 @@ const deleteOrder = async (req, res) => {
   }
 };
 
+const getAllOrder = async (req, res) => {
+  try {
+    const response = await OrderService.getAllOrder();
+
+    return res.status(200).json(response);
+  } catch (e) {
+    return res.status(404).json({
+      message: e
+    })
+  }
+};
+
 module.exports = {
   createOrder,
-  getAllOrder,
+  getAllOrderDetails,
   getDetailsOrder,
-  deleteOrder
+  deleteOrder,
+  getAllOrder
 };

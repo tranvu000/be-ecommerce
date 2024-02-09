@@ -77,7 +77,7 @@ const createOrder = (newOrder) => {
   })
 };
 
-const getAllOrder = (id) => {
+const getAllOrderDetails = (id) => {
   return new Promise(async (resolve, reject) => {
     try {
       const order = await Order.find({
@@ -182,9 +182,26 @@ const deleteOrder = (id, data) => {
   })
 };
 
+const getAllOrder = () => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const allOrder = await Order.find();
+      
+      resolve({
+        status: 'OK',
+        message: 'Success',
+        data: allOrder
+      })
+    } catch (e) {
+      reject(e)
+    }
+  })
+};
+
 module.exports = {
   createOrder,
-  getAllOrder,
+  getAllOrderDetails,
   getDetailsOrder,
-  deleteOrder
+  deleteOrder,
+  getAllOrder
 };
