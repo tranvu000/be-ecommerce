@@ -4,8 +4,7 @@ const EmailService = require("../services/EmailService");
 
 const createOrder = (newOrder) => {
   return new Promise(async (resolve, reject) => {
-    const { orderItems, paymentMethod, itemsPrice, shippingPrice, totalPrice, fullName, address,
-      city, phone, user, isPaid, paidAt, email } = newOrder;
+    const { orderItems, paymentMethod, itemsPrice, shippingPrice, totalPrice, fullName, address, city, phone, user, isPaid, paidAt, email } = newOrder;
 
     try {
       const promises = orderItems.map( async (order) => {
@@ -82,7 +81,7 @@ const getAllOrderDetails = (id) => {
     try {
       const order = await Order.find({
         user: id
-      });
+      }).sort({createdAt: -1, updatedAt: -1});
 
       if (order === null) {
         resolve({
@@ -162,12 +161,12 @@ const deleteOrder = (id, data) => {
         }
       });
       const results = await Promise.all(promises);
-      const newData = results && results.filter((item) => item);
+      const newData = results && results[0] && results[0].id;
     
-      if (newData.length) {
+      if (newData) {
         resolve ({
           status: 'ERR',
-          message: `Sản phẩm với id${newData.join(',')} không tồn tại`
+          message: `Sản phẩm với id: ${newData} không tồn tại`
         })
       };
     
@@ -185,7 +184,7 @@ const deleteOrder = (id, data) => {
 const getAllOrder = () => {
   return new Promise(async (resolve, reject) => {
     try {
-      const allOrder = await Order.find();
+      const allOrder = await Order.find().sort({createdAt: -1, updatedAt: -1});
       
       resolve({
         status: 'OK',
@@ -198,10 +197,25 @@ const getAllOrder = () => {
   })
 };
 
+const deleteManyOrder = (ids) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      await Order.deleteMany({ _id: ids });
+      resolve({
+        status: 'OK',
+        message: 'Delete order success',
+      })
+    } catch (e) {
+      reject(e);
+    };
+  });
+};
+
 module.exports = {
   createOrder,
   getAllOrderDetails,
   getDetailsOrder,
   deleteOrder,
-  getAllOrder
+  getAllOrder,
+  deleteManyOrder
 };

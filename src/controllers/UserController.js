@@ -3,7 +3,7 @@ const JwtService = require('../services/JwtService');
 
 const createUser = async (req, res) => {
   try {
-    const { name, email, password, confirmPassword, phone } = req.body
+    const { name, email, password, confirmPassword, phone, isAdmin } = req.body
     const reg = /^\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/
     const isCheckEmail = reg.test(email);
 
@@ -152,7 +152,7 @@ const getDetailsUser = async (req, res) => {
 
 const refreshToken = async (req, res) => {
   try {
-    const token = req.headers.token.split(' ')[1]
+    let token = req.headers.token.split(' ')[1]
 
     if (!token) {
       return res.status(200).json({

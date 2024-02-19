@@ -29,7 +29,7 @@ const sendEmailCreateOrder = async (email, orderItems) => {
 
   let info = await transporter.sendMail({
     from: process.env.MAIL_ACCOUNT,
-    to: process.env.MAIL_ACCOUNT,
+    to: email,
     subject: "Bạn đã đặt hàng thành công tại Shop",
     text: "Danh sách đặt hàng của bạn",
     html: `<div><b>Bạn đã đặt hàng thành công tại Shop</b></div>${listItem}`,

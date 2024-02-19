@@ -4,10 +4,11 @@ const { authUserMiddleware, authMiddleware } = require('../middleware/authMiddle
 
 const router = express.Router();
 
-router.post('/create', authUserMiddleware, OrderController.createOrder);
-router.get('/get-all-order-details/:id', authUserMiddleware, OrderController.getAllOrderDetails);
-router.get('/get-details-order/:id', authUserMiddleware, OrderController.getDetailsOrder);
-router.delete('/delete-order/:id', authUserMiddleware, OrderController.deleteOrder);
+router.post('/create/:id', authUserMiddleware, OrderController.createOrder);
+router.get('/get-all-order/:id', authUserMiddleware, OrderController.getAllOrderDetails);
+router.get('/get-details-order/:id', OrderController.getDetailsOrder);
+router.delete('/delete-order/:id', OrderController.deleteOrder);
 router.get('/get-all-order', authMiddleware, OrderController.getAllOrder);
+router.post('/delete-many',authMiddleware, OrderController.deleteMany);
 
 module.exports = router;
