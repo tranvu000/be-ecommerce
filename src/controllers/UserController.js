@@ -71,7 +71,7 @@ const loginUser = async (req, res) => {
 const logoutUser = async (req, res) => {
   try {
     await res.clearCookie('refresh_token');
-    return res.status(200).json({
+        return res.status(200).json({
       status: 'OK',
       message: 'Logout successfully'
     })
@@ -93,8 +93,10 @@ const updateUser = async (req, res) => {
         message: 'The userId is required'
       })
     };
-    const response = await UserService.updateUser(userId, data)
-    return res.status(200).json(response)
+
+    const response = await UserService.updateUser(userId, data);
+
+    return res.status(200).json(response);
   } catch (e) {
     return res.status(404).json({
       message: e

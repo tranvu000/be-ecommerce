@@ -14,7 +14,8 @@ const createUser = (newUser) => {
         resolve({
           status: 'ERR',
           message: 'The email is already'
-        })
+        });
+        return;
       };
 
       const hash = bcrypt.hashSync(password, 10);
@@ -49,7 +50,8 @@ const loginUser = (userLogin) => {
         resolve({
           status: 'ERR',
           message: 'The user is not defined'
-        })
+        });
+        return;
       };
       const comparePassword = bcrypt.compareSync(password, checkUser.password);
 
@@ -57,7 +59,8 @@ const loginUser = (userLogin) => {
         resolve({
           status: 'ERR',
           message: 'The password or user is incorrect'
-        })
+        });
+        return;
       }
 
       const access_token =  await genneralAccessToken({
@@ -87,11 +90,31 @@ const updateUser = (id, data) => {
       const checkUser = await User.findOne({
         _id: id
       });
+
       if (checkUser === null) {
         resolve({
           status: 'ERR',
           message: 'The user is not defined'
-        })
+        });
+        return;
+      };
+
+      if (data.email || data.phone) {
+        const existingUser = await User.findOne({
+          $or: [
+            { email: data.email },
+            { phone: data.phone }
+          ],
+          _id: { $ne: id }
+        });
+
+        if (existingUser) {
+          resolve({
+            status: 'ERR',
+            message: 'Email or phone already exists'
+          });
+          return;
+        }
       };
 
       const updatedUser = await User.findByIdAndUpdate(id, data, { new: true });

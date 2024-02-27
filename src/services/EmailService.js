@@ -14,7 +14,6 @@ const sendEmailCreateOrder = async (email, orderItems) => {
     },
   });
   transporter.use('compile', inlineBase64({cidPrefix: 'somePrefix_'}));
-
   let listItem = '';
   const attachImage = [];
   orderItems.forEach((order) => {
@@ -33,6 +32,7 @@ const sendEmailCreateOrder = async (email, orderItems) => {
     subject: "Bạn đã đặt hàng thành công tại Shop",
     text: "Danh sách đặt hàng của bạn",
     html: `<div><b>Bạn đã đặt hàng thành công tại Shop</b></div>${listItem}`,
+    attachments: attachImage,
   });
 };
 
